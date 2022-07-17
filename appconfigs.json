@@ -1,0 +1,9 @@
+{
+  "network": "mumbai",
+  "dex": "quickswap",
+  "pairsChunkSize": 1000,
+  "cooldownMs": 1000,
+  "tokensChunkSize": 10,
+  "quickswapFactoryMumbai": "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
+  "outputPath": "./output"
+}
