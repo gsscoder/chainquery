@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
 const hre = require('hardhat');
-const bc = require('./bc');
 const uv2queryAbi = require('../artifacts/contracts/UniswapV2Query.sol/UniswapV2Query.json').abi;
 const configs = require('../appconfigs.json');
 
@@ -23,7 +22,7 @@ async function main() {
 
   console.log(`Processing ${tokens.length} tokens`);
 
-  const account = bc.connectAccount(network, process.env.ACCOUNT_KEY);
+  const account = utils.connectAccount(network, process.env.ACCOUNT_KEY);
   const uv2query = new  hre.ethers.Contract(uv2queryAddress, uv2queryAbi, account);
 
   let allTokens = [];

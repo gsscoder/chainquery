@@ -4,7 +4,6 @@ const configs = require('../appconfigs.json');
 const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
-const bc = require('./bc');
 
 const network = configs.network;
 const dex = configs.dex;
@@ -14,7 +13,7 @@ const factoryAddress = configs[`${dex}Factory${utils.toTitleCase(network)}`]
 const cooldownMs = configs.cooldownMs;
 
 async function main() {
-  const account = bc.connectAccount(network, process.env.ACCOUNT_KEY);
+  const account = utils.connectAccount(network, process.env.ACCOUNT_KEY);
   const uv2query = new  hre.ethers.Contract(uv2queryAddress, uv2queryAbi, account);
   const allPairsNum = (await uv2query.getPairsLenght(factoryAddress)).toNumber();
   console.log(`${dexDescr} pairs: ${allPairsNum}`);
