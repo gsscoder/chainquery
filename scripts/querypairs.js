@@ -28,13 +28,16 @@ async function main() {
     console.log(`>> Cooling down for ${cooldownMs} ms`);
     await utils.sleep(cooldownMs);
     for (let c = 0; c < pairsChunk.length; c++) {
-      const token0ctr = pairsChunk[c][0];
-      const token1ctr = pairsChunk[c][1];
-      const pairCtr = pairsChunk[c][2];
       pairs.push({
-        "pair": pairCtr,
-        "token0": token0ctr,
-        "token1": token1ctr
+        pair: pairsChunk[c][0],
+        token0: {
+          address: pairsChunk[c][1],
+          reserve: pairsChunk[c][2].toString()
+        },
+        token1: {
+          address: pairsChunk[c][3],
+          reserve: pairsChunk[c][4].toString()
+        }       
       })
     }
   }

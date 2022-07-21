@@ -32,23 +32,34 @@ contract UniswapV2Query is Ownable {
         uint8 decimals;
     }
 
+    struct Pair {
+        address address_;
+        address token0;
+        uint112 reserve0;
+        address token1;
+        uint112 reserve1;
+    }
+
     function getPairsLenght(address factoryAddr) external onlyOwner view returns (uint256) {
         IUniswapV2Factory factory = IUniswapV2Factory(factoryAddr);
         return factory.allPairsLength();
     }
 
-    function getPairsByRange(address factoryAddr, uint256 fromIndex, uint256 toIndex) external onlyOwner view returns (address[3][] memory)  {
+    function getPairsByRange(address factoryAddr, uint256 fromIndex, uint256 toIndex) external onlyOwner view returns (Pair[] memory)  {
         require(fromIndex <= toIndex, "fromIndex cannot be greater than toIndex");
         IUniswapV2Factory factory = IUniswapV2Factory(factoryAddr);
         uint256 _length = factory.allPairsLength();
         require (toIndex < _length, "toIndex cannot be greater than all pairs length");
         uint256 quantity = (toIndex - fromIndex) + 1;
-        address[3][] memory result = new address[3][](quantity);
+        Pair[] memory result = new Pair[](quantity);
         for (uint256 i = 0; i < quantity; i++) {
             IUniswapV2Pair pair = IUniswapV2Pair(factory.allPairs(fromIndex + i));
-            result[i][0] = pair.token0();
-            result[i][1] = pair.token1();
-            result[i][2] = address(pair);         
+            result[i].address_ = address(pair);         
+            result[i].token0 = pair.token0();
+            result[i].token1= pair.token1();
+            (uint112 reserve0, uint112 reserve1,) = pair.getReserves();
+            result[i].reserve0 = reserve0;
+            result[i].reserve1 = reserve1;
         }
         return result;
     }
