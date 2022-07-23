@@ -29,7 +29,7 @@ async function main() {
     await utils.sleep(cooldownMs);
     for (let c = 0; c < pairsChunk.length; c++) {
       pairs.push({
-        pair: pairsChunk[c][0],
+        address: pairsChunk[c][0],
         token0: {
           address: pairsChunk[c][1],
           reserve: pairsChunk[c][2].toString()
@@ -46,7 +46,7 @@ async function main() {
   console.log(`Saving ${fileName}`);
   fs.writeFileSync(fileName, JSON.stringify(pairs, null, 2), {encoding: 'utf8'});
 
-  console.log('completed');
+  console.log('Completed');
 }
 
 main()
