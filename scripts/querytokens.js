@@ -15,8 +15,8 @@ async function main() {
   const pairs = JSON.parse(fs.readFileSync(pairsOut, {encoding: 'utf8'}));
   const tokensSet = new Set();
   pairs.forEach(p => {
-    tokensSet.add(p.token0);
-    tokensSet.add(p.token1);
+    tokensSet.add(p.token0.address);
+    tokensSet.add(p.token1.address);
   });
   const tokens = [...tokensSet];
 
@@ -43,13 +43,13 @@ async function main() {
       try {
         tokensChunk = await uv2query.getERC20Tokens(slice);
       } catch {
-        console.log('ERROR: a token address is invalid. Attempting single retrieval');
+        console.log('ERROR: chunk retrieval failed. Attempting single fetch');
         for (let t = 0; t < slice.length; t++) {
           let token;
           try {
             token = await uv2query.getERC20Token(slice[t]);
           } catch {
-            console.log(`ERROR: token ${slice[t]} is invalid`);
+            console.log(`WARNING: token ${slice[t]} is invalid`);
             continue;
           }
           tokensChunk.push(token);
@@ -57,10 +57,11 @@ async function main() {
       }
       await utils.sleep(configs.cooldownMs);
       allTokens = allTokens.concat(tokensChunk);
+      if (i>200) break; // DEBUG
     }
   }
 
-  let result = allTokens.map(t => {
+  let tokensResult = allTokens.map(t => {
     return {
       address: t[0],
       symbol: t[1],
@@ -68,13 +69,43 @@ async function main() {
       decimals: t[3]
     }
   });
-  result = result.filter(t => t.symbol && t.decimals);
+  tokensResult = tokensResult.filter(t => t.symbol && t.decimals);
 
-  const fileName = path.join(configs.outputPath, `${network.toLowerCase()}Tokens.json`)
-  console.log(`Saving ${fileName}`);
-  fs.writeFileSync(fileName, JSON.stringify(result, null, 2), {encoding: 'utf8'});
+  const tokensOut = path.join(configs.outputPath, `${network.toLowerCase()}Tokens.json`)
+  console.log(`Saving ${tokensOut}`);
+  fs.writeFileSync(tokensOut, JSON.stringify(tokensResult, null, 2), {encoding: 'utf8'});
 
-  console.log('completed');
+  console.log('Adding token data to pairs file');
+
+  const pairsResult = [];
+  for (let i = 0; i < pairs.length; i++) {
+    const token0 = tokensResult.find(t => t.address === pairs[i].token0.address);
+    const token1 = tokensResult.find(t => t.address === pairs[i].token1.address);
+    if (!token0 || !token1) {
+      console.log(`WARNING: pair ${pairs[i].address} is invalid`);
+      continue;
+    }
+    pairsResult.push({
+      address: pairs[i].address,
+      token0: {
+        address: token0?.address,
+        symbol: token0?.symbol,
+        name: token0?.name,
+        decimals: token0?.decimals
+      },
+      token1: {
+        address: token1?.address,
+        symbol: token1?.symbol,
+        name: token1?.name,
+        decimals: token1?.decimals
+      }
+    });
+  }
+
+  console.log(`Updating ${pairsOut}`);
+  fs.writeFileSync(pairsOut, JSON.stringify(pairsResult, null, 2), {encoding: 'utf8'});  
+
+  console.log('Completed');
 }
 
 main()
