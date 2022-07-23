@@ -37,3 +37,5 @@ UV2QUERY_ADDRESS_MUMBAI="0x460...7e67"
 - Run [querypairs](scripts/querypairs.js) script to get token pairs from the configured DEX.
 
 - Run [querytokens](scripts/querytokens.js) to get tokens data using querypairs output.
+
+After running the `querytokens` script, the `querypairs` output file will be updated with tokens data.

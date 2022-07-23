@@ -57,7 +57,6 @@ async function main() {
       }
       await utils.sleep(configs.cooldownMs);
       allTokens = allTokens.concat(tokensChunk);
-      if (i>200) break; // DEBUG
     }
   }
 
