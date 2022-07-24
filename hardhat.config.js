@@ -1,6 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
 require("dotenv").config();
-const configs = require('./appconfigs.json');
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -26,7 +25,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   },
   networks: {
     mumbai: {
-      url: process.env[`PROVIDER_URL_${configs.network.toUpperCase()}`],
+      url: process.env[`PROVIDER_URL_MUMBAI`],
+      accounts: [process.env.ACCOUNT_KEY]
+    },
+    polygon: {
+      url: process.env[`PROVIDER_URL_POLYGON`],
       accounts: [process.env.ACCOUNT_KEY]
     }
   }  
