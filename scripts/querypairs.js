@@ -25,7 +25,6 @@ async function main() {
     const to = ranges[r][1];
     console.log(`Getting pairs from ${from} to ${to}`);
     const pairsChunk = await uv2query.getPairsByRange(factoryAddress, from, to);
-    console.log(`>> Cooling down for ${cooldownMs} ms`);
     await utils.sleep(cooldownMs);
     for (let c = 0; c < pairsChunk.length; c++) {
       pairs.push({

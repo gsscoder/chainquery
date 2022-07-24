@@ -70,10 +70,6 @@ async function main() {
   });
   tokensResult = tokensResult.filter(t => t.symbol && t.decimals);
 
-  const tokensOut = path.join(configs.outputPath, `${network.toLowerCase()}Tokens.json`)
-  console.log(`Saving ${tokensOut}`);
-  fs.writeFileSync(tokensOut, JSON.stringify(tokensResult, null, 2), {encoding: 'utf8'});
-
   console.log('Adding token data to pairs file');
 
   const pairsResult = [];
@@ -84,22 +80,36 @@ async function main() {
       console.log(`WARNING: pair ${pairs[i].address} is invalid`);
       continue;
     }
+    let reserve0 = 0;
+    if (pairs[i].token0.reserve !== undefined && pairs[i].token0.reserve !== "0") {
+      reserve0 = hre.ethers.BigNumber.from(pairs[i].token0.reserve) / Math.pow(10, token0.decimals);
+    }
+    let reserve1 = 0;
+    if (pairs[i].token1.reserve !== undefined && pairs[i].token1.reserve !== "0") {
+      reserve1 = hre.ethers.BigNumber.from(pairs[i].token1.reserve) / Math.pow(10, token1.decimals);  
+    }
     pairsResult.push({
       address: pairs[i].address,
       token0: {
         address: token0?.address,
         symbol: token0?.symbol,
         name: token0?.name,
-        decimals: token0?.decimals
+        decimals: token0?.decimals,
+        reserve: reserve0
       },
       token1: {
         address: token1?.address,
         symbol: token1?.symbol,
         name: token1?.name,
-        decimals: token1?.decimals
+        decimals: token1?.decimals,
+        reserve: reserve1
       }
     });
   }
+
+  const tokensOut = path.join(configs.outputPath, `${network.toLowerCase()}Tokens.json`)
+  console.log(`Saving ${tokensOut}`);
+  fs.writeFileSync(tokensOut, JSON.stringify(tokensResult, null, 2), {encoding: 'utf8'});
 
   console.log(`Updating ${pairsOut}`);
   fs.writeFileSync(pairsOut, JSON.stringify(pairsResult, null, 2), {encoding: 'utf8'});  
