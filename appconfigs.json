@@ -1,9 +1,11 @@
 {
-  "network": "mumbai",
+  "network": "polygon",
   "dex": "quickswap",
-  "pairsChunkSize": 1000,
-  "cooldownMs": 1000,
+  "pairsChunkSize": 500,
+  "cooldownMs": 2000,
+  "cooldownAfterFailSec": 3,
   "tokensChunkSize": 10,
   "quickswapFactoryMumbai": "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
+  "quickswapFactoryPolygon": "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
   "outputPath": "./output"
 }

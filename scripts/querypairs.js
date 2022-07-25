@@ -10,7 +10,6 @@ const dex = configs.dex;
 const dexDescr = `${dex} (${network})`;
 const uv2queryAddress = process.env[`UV2QUERY_ADDRESS_${network.toUpperCase()}`];
 const factoryAddress = configs[`${dex}Factory${utils.toTitleCase(network)}`]
-const cooldownMs = configs.cooldownMs;
 
 async function main() {
   const account = utils.connectAccount(network, process.env.ACCOUNT_KEY);
@@ -23,9 +22,22 @@ async function main() {
   for (let r = 0; r < ranges.length; r++) {
     const from = ranges[r][0];
     const to = ranges[r][1];
-    console.log(`Getting pairs from ${from} to ${to}`);
-    const pairsChunk = await uv2query.getPairsByRange(factoryAddress, from, to);
-    await utils.sleep(cooldownMs);
+    console.log(`[${[r]}] Getting pairs from ${from} to ${to}`);
+    let succeeded = false;
+    let pairsChunk;
+    try {
+      pairsChunk = await uv2query.getPairsByRange(factoryAddress, from, to);
+      succeeded = true;
+    } catch {
+      console.log(`ERROR: failed to get pairs for range ${[r]}`);
+      console.log(`Cooling down for ${configs.cooldownAfterFailSec} sec`);
+      await utils.sleep(configs.cooldownAfterFailSec * 1000);
+      r--;
+      continue;
+    }
+    if (succeeded) {
+      await utils.sleep(configs.cooldownMs);
+    }
     for (let c = 0; c < pairsChunk.length; c++) {
       pairs.push({
         address: pairsChunk[c][0],
