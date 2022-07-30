@@ -1,10 +1,8 @@
 const hre = require('hardhat');
 
-exports.toTitleCase = function toTitleCase(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+exports.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
 
-exports.getRanges = function getRanges(length, step) {
+exports.getRanges = (length, step) =>{
   const ranges = [];
   if (step > length) {
     throw 'step must be less than length';
@@ -21,10 +19,11 @@ exports.getRanges = function getRanges(length, step) {
   return ranges;
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-exports.sleep = sleep;
+exports.sleep = ms => new Promise(r => setTimeout(r, ms));
 
-exports.connectAccount = function connectAccount(network, key) {
+exports.zeroPad = (num, places) => String(num).padStart(places, '0')
+
+exports.connectAccount = (network, key) => {
   let networkUrl = process.env[`PROVIDER_URL_${network.toUpperCase()}`];
   console.log(`Connecting to ${network} provider`);
   const provider = new hre.ethers.providers.JsonRpcProvider(networkUrl);

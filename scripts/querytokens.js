@@ -27,18 +27,28 @@ async function main() {
 
   let allTokens = [];
 
+  let startIndex, endIndex;
+  let startChunk_, endChunk_;
   const chunks = Math.ceil(tokens.length / configs.tokensChunkSize);
   if (chunks <= 1) {
+    console.log('Getting all tokens in one request');
     allTokens.push(await uv2query.getERC20Tokens(tokens));
   }
   else {
-    for (let i = 0; i < tokens.length; i += configs.tokensChunkSize) {
+    console.log(`Total chunks: ${chunks}`);
+    const { startChunk, endChunk } = parseArgs();
+    startChunk_ = startChunk;
+    endChunk_ = endChunk;
+    startIndex = (startChunk * configs.tokensChunkSize) - configs.tokensChunkSize;
+    endIndex = (endChunk * configs.tokensChunkSize) - 1;
+    let chunkIndex = startChunk;
+    for (let i = startIndex; i < tokens.length; i += configs.tokensChunkSize) {
       let toIndex = i + configs.tokensChunkSize - 1;
       if (toIndex > tokens.length - 1) {
         toIndex = tokens.length - 1;
       }
-      console.log(`Chunk from ${i} to ${toIndex}`);
-      const slice = tokens.slice(i, toIndex);
+      console.log(`[${chunkIndex}] Chunk from ${i} to ${toIndex}`);
+      const slice = tokens.slice(i, toIndex + 1);
       let tokensChunk = [];
       try {
         tokensChunk = await uv2query.getERC20Tokens(slice);
@@ -57,6 +67,29 @@ async function main() {
       }
       await utils.sleep(configs.cooldownMs);
       allTokens = allTokens.concat(tokensChunk);
+      if (toIndex == endIndex) {
+        break;
+      }
+      chunkIndex++;
+    }
+
+    function parseArgs() {
+      const args = process.argv.slice(2);
+      if (args.length != 2) {
+        console.log('Usage: node querytokens START_CHUNK END_CHUNK');
+        process.exit();
+      }
+      const start = parseInt(args[0]);
+      if (start < 1 || start > chunks) {
+        console.log(`START_CHUNK must be between 1 and ${chunks}`);
+        process.exit();
+      }
+      const end = parseInt(args[1]);
+      if (end < 1 || end > chunks || end < start) {
+        console.log(`START_CHUNK must be between 1 and ${chunks} and lesser than ${start}`);
+        process.exit();
+      }    
+      return { startChunk: start, endChunk: end }; 
     }
   }
 
@@ -68,51 +101,12 @@ async function main() {
       decimals: t[3]
     }
   });
-  tokensResult = tokensResult.filter(t => t.symbol && t.decimals);
 
-  console.log('Adding token data to pairs file');
-
-  const pairsResult = [];
-  for (let i = 0; i < pairs.length; i++) {
-    const token0 = tokensResult.find(t => t.address === pairs[i].token0.address);
-    const token1 = tokensResult.find(t => t.address === pairs[i].token1.address);
-    if (!token0 || !token1) {
-      console.log(`WARNING: pair ${pairs[i].address} is invalid`);
-      continue;
-    }
-    let reserve0 = 0;
-    if (pairs[i].token0.reserve !== undefined && pairs[i].token0.reserve !== "0") {
-      reserve0 = hre.ethers.BigNumber.from(pairs[i].token0.reserve) / Math.pow(10, token0.decimals);
-    }
-    let reserve1 = 0;
-    if (pairs[i].token1.reserve !== undefined && pairs[i].token1.reserve !== "0") {
-      reserve1 = hre.ethers.BigNumber.from(pairs[i].token1.reserve) / Math.pow(10, token1.decimals);  
-    }
-    pairsResult.push({
-      address: pairs[i].address,
-      token0: {
-        address: token0?.address,
-        symbol: token0?.symbol,
-        name: token0?.name,
-        decimals: token0?.decimals,
-        reserve: reserve0
-      },
-      token1: {
-        address: token1?.address,
-        symbol: token1?.symbol,
-        name: token1?.name,
-        decimals: token1?.decimals,
-        reserve: reserve1
-      }
-    });
-  }
-
-  const tokensOut = path.join(configs.outputPath, `${network.toLowerCase()}Tokens.json`)
+  const start = utils.zeroPad(startChunk_, 4);
+  const end = utils.zeroPad(endChunk_, 4);
+  const tokensOut = path.join(configs.outputPath, `${network.toLowerCase()}Tokens_${start}-${end}.json`)
   console.log(`Saving ${tokensOut}`);
   fs.writeFileSync(tokensOut, JSON.stringify(tokensResult, null, 2), {encoding: 'utf8'});
-
-  console.log(`Updating ${pairsOut}`);
-  fs.writeFileSync(pairsOut, JSON.stringify(pairsResult, null, 2), {encoding: 'utf8'});  
 
   console.log('Completed');
 }
