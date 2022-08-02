@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
-const utils = require('./utils');
-const configs = require('../appconfigs.json');
+const utils = require('../utils');
+const configs = require('../../appconfigs.json');
 
 const network = configs.network;
 

@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const utils = require('./utils');
+const utils = require('../utils');
 const hre = require('hardhat');
-const configs = require('../appconfigs.json');
+const configs = require('../../appconfigs.json');
 
 const hasSN = n => {
   const str = n.toString();

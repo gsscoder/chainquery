@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const utils = require('./utils');
+const utils = require('../utils');
 const hre = require('hardhat');
-const uv2queryAbi = require('../artifacts/contracts/UniswapV2Query.sol/UniswapV2Query.json').abi;
-const configs = require('../appconfigs.json');
+const uv2queryAbi = require('../../artifacts/contracts/UniswapV2Query.sol/UniswapV2Query.json').abi;
+const configs = require('../../appconfigs.json');
 
 const network = configs.network;
 const dex = configs.dex;
