@@ -1,6 +1,6 @@
 # chainquery
 
-Utilities to get data from from a blockchain using [UniswapV2Query](contracts/UniswapV2Query.sol) contract.
+Utilities to get data directly on chain using [UniswapV2Query](contracts/UniswapV2Query.sol) contract.
 
 ## Configuration
 
@@ -35,8 +35,10 @@ UV2QUERY_ADDRESS_POLYGON="0x460...7e67"
 
 - Set all needed configuration values.
 
-- Run [querypairs](scripts/querypairs.js) script to get token pairs from the configured DEX.
+- Run [querypairs](scripts/query/querypairs.js) to get token pairs data from the configured DEX.
 
-- Run [querytokens](scripts/querytokens.js) to get tokens data using querypairs output.
+- Run [querytokens](scripts/query/querytokens.js) to get tokens data using querypairs output.
 
-After running the `querytokens` script, the `querypairs` output file will be updated with tokens data.
+- Run [jointokensfiles](scripts/postproc/jointokensfiles.js) to join querytokens output into a single file.
+
+- Run [addtokenstopairs](scripts/postproc/addtokenstopairs.js) to add token data to pairs file and normalize reserves.
