@@ -1,12 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
-const utils = require('../utils');
 const configs = require('../../appconfigs.json');
 
 const network = configs.network;
 
-glob(`${configs.outputPath}/${network}Tokens_*.json`, function (err, files) {
+glob(`${configs.outputPath}/${network.toLowerCase()}Tokens_*.json`, function (err, files) {
   if (err) {
     console.log(`ERROR: ${err}`);
     process.exit(1);
