@@ -35,10 +35,12 @@ UV2QUERY_ADDRESS_POLYGON="0x460...7e67"
 
 - Set all needed configuration values.
 
-- Run [querypairs](scripts/query/querypairs.js) to get token pairs data from the configured DEX.
+- Use [querypairs](scripts/query/querypairs.js) to get token pairs data from the configured DEX.
 
-- Run [querytokens](scripts/query/querytokens.js) to get tokens data using querypairs output.
+- Use [querytokens](scripts/query/querytokens.js) to get tokens data using querypairs output.
 
-- Run [jointokensfiles](scripts/postproc/jointokensfiles.js) to join querytokens output into a single file.
+- Use [jointokensfiles](scripts/postproc/jointokensfiles.js) to join querytokens output into a single file.
 
-- Run [addtokenstopairs](scripts/postproc/addtokenstopairs.js) to add token data to pairs file and normalize reserves.
+- Use [addtokenstopairs](scripts/postproc/addtokenstopairs.js) to add token data to pairs file and normalize reserves.
+
+- Use [refinepairs](scripts/refine/refinepairsjs) to remove not meaningful pairs.
